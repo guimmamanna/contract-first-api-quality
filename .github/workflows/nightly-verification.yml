@@ -1,0 +1,61 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Nightly Contract Verification
+#
+# Runs provider verification against the latest published contracts
+# and integration tests against external services on a schedule.
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: Nightly Contract Verification
+
+on:
+  schedule:
+    - cron: "0 3 * * *"  # 03:00 UTC daily
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: "3.12"
+  PROVIDER_API_KEY: "contract-testing-key-2024"
+
+jobs:
+  nightly-verification:
+    name: Full Contract & Integration Suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.txt -r requirements-dev.txt
+
+      - name: Run full test suite
+        run: |
+          echo "── Schema validation ──"
+          pytest tests/schema/ -v --junitxml=reports/nightly-schema.xml
+
+          echo "── API negative & auth tests ──"
+          pytest tests/api/ -v --junitxml=reports/nightly-api.xml
+
+          echo "── Consumer contract generation ──"
+          pytest tests/contract/test_consumer_contract.py -v --junitxml=reports/nightly-consumer.xml
+
+          echo "── Provider verification ──"
+          pytest tests/contract/test_provider_verification.py -v --junitxml=reports/nightly-provider.xml
+
+          echo "── E2E integration ──"
+          pytest tests/integration/test_e2e.py -v --junitxml=reports/nightly-e2e.xml
+
+          echo "── OrangeHRM integration ──"
+          pytest tests/integration/test_orangehrm.py -v --run-integration --junitxml=reports/nightly-orangehrm.xml || true
+
+      - name: Upload nightly reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nightly-reports-${{ github.run_number }}
+          path: reports/
+          retention-days: 30

@@ -1,0 +1,4 @@
+# Pact contract directory
+# Generated Pact JSON files are stored here.
+# These files are artifacts of consumer contract tests and are used
+# during provider verification.

@@ -1,0 +1,215 @@
+{
+  "consumer": {
+    "name": "HRDashboardConsumer"
+  },
+  "provider": {
+    "name": "EmployeeManagementProvider"
+  },
+  "interactions": [
+    {
+      "description": "a request to list employees",
+      "providerState": "employees exist",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/employees",
+        "query": "page=1&per_page=20"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+        },
+        "body": {
+          "employees": [
+            {
+              "id": "e1b2c3d4-0000-0000-0000-000000000001",
+              "first_name": "Alice",
+              "last_name": "Johnson",
+              "email": "alice.johnson@company.com",
+              "job_title": "Senior Software Engineer",
+              "department": "Engineering",
+              "salary": 135000.0,
+              "created_at": "2024-01-15T10:30:00",
+              "updated_at": "2024-01-15T10:30:00"
+            }
+          ],
+          "total": 1,
+          "page": 1,
+          "per_page": 20
+        }
+      }
+    },
+    {
+      "description": "a request to list employees filtered by department",
+      "providerState": "employees exist in Engineering",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/employees",
+        "query": "page=1&per_page=20&department=Engineering"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+        },
+        "body": {
+          "employees": [
+            {
+              "id": "e1b2c3d4-0000-0000-0000-000000000001",
+              "first_name": "Alice",
+              "last_name": "Johnson",
+              "email": "alice.johnson@company.com",
+              "job_title": "Senior Software Engineer",
+              "department": "Engineering",
+              "salary": 135000.0,
+              "created_at": "2024-01-15T10:30:00",
+              "updated_at": "2024-01-15T10:30:00"
+            }
+          ],
+          "total": 1,
+          "page": 1,
+          "per_page": 20
+        }
+      }
+    },
+    {
+      "description": "a request to get an employee by id",
+      "providerState": "employee e1b2c3d4-0000-0000-0000-000000000001 exists",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/employees/e1b2c3d4-0000-0000-0000-000000000001"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+        },
+        "body": {
+          "id": "e1b2c3d4-0000-0000-0000-000000000001",
+          "first_name": "Alice",
+          "last_name": "Johnson",
+          "email": "alice.johnson@company.com",
+          "job_title": "Senior Software Engineer",
+          "department": "Engineering",
+          "salary": 135000.0,
+          "created_at": "2024-01-15T10:30:00",
+          "updated_at": "2024-01-15T10:30:00"
+        }
+      }
+    },
+    {
+      "description": "a request for a non-existent employee",
+      "providerState": "no employee with id not-found-id exists",
+      "request": {
+        "method": "GET",
+        "path": "/api/v1/employees/not-found-id"
+      },
+      "response": {
+        "status": 404,
+        "headers": {
+        },
+        "body": {
+          "detail": "Employee not-found-id not found"
+        }
+      }
+    },
+    {
+      "description": "a request to create an employee",
+      "providerState": "no employee with email dave.brown@company.com exists",
+      "request": {
+        "method": "POST",
+        "path": "/api/v1/employees",
+        "body": {
+          "first_name": "Dave",
+          "last_name": "Brown",
+          "email": "dave.brown@company.com",
+          "job_title": "DevOps Engineer",
+          "department": "Infrastructure",
+          "salary": 120000.0
+        }
+      },
+      "response": {
+        "status": 201,
+        "headers": {
+        },
+        "body": {
+          "first_name": "Dave",
+          "last_name": "Brown",
+          "email": "dave.brown@company.com",
+          "job_title": "DevOps Engineer",
+          "department": "Infrastructure",
+          "salary": 120000.0,
+          "id": "new-employee-id-001",
+          "created_at": "2024-03-01T09:00:00",
+          "updated_at": "2024-03-01T09:00:00"
+        }
+      }
+    },
+    {
+      "description": "a request to create a duplicate employee",
+      "providerState": "employee with email alice.johnson@company.com already exists",
+      "request": {
+        "method": "POST",
+        "path": "/api/v1/employees",
+        "body": {
+          "first_name": "Alice",
+          "last_name": "Johnson",
+          "email": "alice.johnson@company.com",
+          "job_title": "Engineer",
+          "department": "Engineering",
+          "salary": 100000.0
+        }
+      },
+      "response": {
+        "status": 409,
+        "headers": {
+        },
+        "body": {
+          "detail": "Employee with email alice.johnson@company.com already exists"
+        }
+      }
+    },
+    {
+      "description": "a request to update an employee salary",
+      "providerState": "employee e1b2c3d4-0000-0000-0000-000000000001 exists",
+      "request": {
+        "method": "PUT",
+        "path": "/api/v1/employees/e1b2c3d4-0000-0000-0000-000000000001",
+        "body": {
+          "salary": 145000.0
+        }
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+        },
+        "body": {
+          "id": "e1b2c3d4-0000-0000-0000-000000000001",
+          "first_name": "Alice",
+          "last_name": "Johnson",
+          "email": "alice.johnson@company.com",
+          "job_title": "Senior Software Engineer",
+          "department": "Engineering",
+          "salary": 145000.0,
+          "created_at": "2024-01-15T10:30:00",
+          "updated_at": "2024-06-01T12:00:00"
+        }
+      }
+    },
+    {
+      "description": "a request to delete an employee",
+      "providerState": "employee e1b2c3d4-0000-0000-0000-000000000001 exists",
+      "request": {
+        "method": "DELETE",
+        "path": "/api/v1/employees/e1b2c3d4-0000-0000-0000-000000000001"
+      },
+      "response": {
+        "status": 204,
+        "headers": {
+        }
+      }
+    }
+  ],
+  "metadata": {
+    "pactSpecification": {
+      "version": "2.0.0"
+    }
+  }
+}

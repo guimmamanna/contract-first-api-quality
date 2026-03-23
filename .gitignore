@@ -1,0 +1,38 @@
+# Byte-compiled / optimized
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Distribution
+*.egg-info/
+dist/
+build/
+
+# Test artifacts
+reports/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Pact logs (keep contracts, ignore logs)
+pacts/logs/
+
+# Docker
+*.log
+
+# Environment
+.env
+.env.local

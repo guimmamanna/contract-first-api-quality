@@ -1,0 +1,69 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# contract-first-api-quality — Docker Compose
+# Orchestrates provider, consumer, and test runner containers.
+# ─────────────────────────────────────────────────────────────────────────────
+
+version: "3.9"
+
+services:
+  # ── Provider Service ────────────────────────────────────────────────────────
+  provider:
+    build:
+      context: .
+      dockerfile: Dockerfile.provider
+    ports:
+      - "8000:8000"
+    environment:
+      - PROVIDER_API_KEY=contract-testing-key-2024
+      - LOG_LEVEL=info
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    networks:
+      - contract-net
+
+  # ── Consumer Service ────────────────────────────────────────────────────────
+  consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile.consumer
+    ports:
+      - "8001:8001"
+    environment:
+      - PROVIDER_BASE_URL=http://provider:8000
+      - PROVIDER_API_KEY=contract-testing-key-2024
+    depends_on:
+      provider:
+        condition: service_healthy
+    networks:
+      - contract-net
+
+  # ── Test Runner ─────────────────────────────────────────────────────────────
+  test-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.provider
+    command: >
+      sh -c "
+        echo '── Running schema validation tests ──' &&
+        pytest tests/schema/ -v &&
+        echo '── Running negative & auth tests ──' &&
+        pytest tests/api/ -v &&
+        echo '── Running e2e integration tests ──' &&
+        pytest tests/integration/test_e2e.py -v &&
+        echo '── All tests passed ──'
+      "
+    environment:
+      - PROVIDER_BASE_URL=http://provider:8000
+      - PROVIDER_API_KEY=contract-testing-key-2024
+    depends_on:
+      provider:
+        condition: service_healthy
+    networks:
+      - contract-net
+
+networks:
+  contract-net:
+    driver: bridge
